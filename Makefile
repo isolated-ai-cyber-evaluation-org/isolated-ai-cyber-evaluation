@@ -1,9 +1,9 @@
-.PHONY: validate test test-schemas test-policy test-unit test-api test-architecture test-traceability docs-check typecheck secret-check supply-chain-check
+.PHONY: validate test test-schemas test-policy test-unit test-integration test-api test-architecture test-traceability docs-check typecheck secret-check supply-chain-check
 
 validate:
 	npm run validate
 
-test: test-schemas test-policy test-unit test-api test-architecture test-traceability docs-check
+test: test-schemas test-policy test-unit test-integration test-api test-architecture test-traceability docs-check
 
 test-schemas:
 	npm run test:schemas
@@ -13,6 +13,9 @@ test-policy:
 
 test-unit:
 	npm run test:unit
+
+test-integration:
+	npm run test:integration
 
 test-api:
 	npm run test:api
@@ -33,5 +36,5 @@ secret-check:
 	npm run test:secrets
 
 supply-chain-check:
-	npm --cache /tmp/cyber-eval-phase2-npm-cache --logs-dir /tmp/cyber-eval-phase2-npm-logs audit --audit-level=high
+	npm --cache /tmp/cyber-eval-phase3-npm-cache --logs-dir /tmp/cyber-eval-phase3-npm-logs audit --audit-level=high
 	npm sbom --sbom-format=cyclonedx | node -e 'JSON.parse(require("fs").readFileSync(0, "utf8")); console.log("SBOM JSON valid")'

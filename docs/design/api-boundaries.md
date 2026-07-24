@@ -143,3 +143,19 @@ Phase 2 implements only contracts and deterministic in-memory decisions:
 | External API description | `api/openapi.yaml` | interface-only OpenAPI; no server URL or listener implementation |
 
 Phase 2 intentionally stops before steps 9–12 of the server-side resolution flow. It has no Credential Broker adapter、firewall lease、fixed test adapter、Runner or evidence transport. Their absence is tested by `ARCH-201` and is not an implementation gap to be silently filled.
+
+## Phase 3 local interface realization
+
+The OpenAPI contract remains listener-free and declares no `servers`. Every route is
+nested below `/v1/engagements/{engagement_id}`; the TypeScript operation ports extend
+`OperationContext`, which requires engagement、actor、action digest and time.
+
+The local Model Gateway returns one configured structured proposal. The Tool Gateway
+then loads the server-owned Engagement、Scope and ROE, obtains a Policy decision and
+returns `MOCK_EXECUTION_DISABLED` even for `PERMIT`. It accepts no address, URL,
+hostname, repository path, command or execution payload.
+
+The Credential Broker mock is a metadata-only contract. It returns an opaque
+`capability_id` bound to engagement、target、purpose profile and expiry. Neither its
+TypeScript type nor `capability-grant.schema.json` has a credential value, password,
+private key or bearer material field.

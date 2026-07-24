@@ -148,3 +148,23 @@ Phase 2 adds only typed contracts and deterministic memory-only behavior:
 - Schema、Policy、state、API、architecture、traceability tests
 
 No service entry point、network/process/filesystem adapter、credential-bearing interface、cloud SDK、IaC or Runner/range provisioner exists. This skeleton concretizes ADR-003、ADR-013 and ADR-014 without changing their decisions.
+
+## 15. Phase 3 local Control Plane realization
+
+Phase 3 activates deterministic logic only inside `TB-CP`:
+
+- immutable Engagement、Scope、ROE snapshots and memory-only runtime state
+- ROE/Engagement time-window intersection and fail-closed Policy adapter
+- content-bound、independent、one-shot Approval Service
+- audit-attempt-before-mutation with SHA-256 event digest generation
+- model/Runner-independent Emergency Stop latch
+- deterministic Model Gateway fake and policy-mediated Tool Gateway mock
+- Credential Broker mock that returns opaque capability metadata only
+- local composition root and positive/negative integration harness
+
+`TB-EP` and `TB-CR` are represented only by opaque IDs and non-executing mock
+responses. `TB-OP` is an append-only port backed by memory for tests, not a WORM
+implementation. `TB-AI` is a deterministic fake with no network client. No server,
+route, external API, filesystem adapter, credential material, Runner, exploit or cloud
+resource exists. A Policy `PERMIT` therefore still returns
+`MOCK_EXECUTION_DISABLED`.

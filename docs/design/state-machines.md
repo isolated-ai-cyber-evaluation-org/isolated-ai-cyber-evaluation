@@ -110,3 +110,16 @@ The skeleton encodes explicit transition tables in:
 `src/state/state-machine.ts` performs compare-before-transition and throws `InvalidTransitionError` for every missing edge. It has no persistence、scheduler、Runner or side effect. In particular, the negative tests prove that a job cannot skip Policy or evidence collection、an approval cannot be replayed after consumption、a destroyed Runner cannot be reused and partial destruction cannot be declared complete.
 
 The Mermaid state diagrams remain normative. `tests/unit/state-machines.test.ts` is the Phase 2 executable conformance subset; future transition additions require coordinated diagram、table、negative-test and traceability updates.
+
+## Phase 3 stateful services
+
+`LocalEngagementService` applies the existing Engagement transition table and increments
+a memory-only revision after a successful audit attempt and, where required, one-shot
+approval consumption. `LocalApprovalService` applies the existing Approval transition
+table for request、review、approve and consume. Missing edges still throw
+`InvalidTransitionError`; Phase 3 adds no permissive transition.
+
+Emergency Stop is a separate dominant latch rather than a resumable state-machine edge.
+Once active, Policy returns `TERMINATE/STOP_ACTIVE`; the MVP exposes no clear/reset
+method. A new execution after incident review remains a future, separately approved
+operation.

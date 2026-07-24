@@ -20,6 +20,7 @@ export type PolicyDecisionId = Brand<string, "PolicyDecisionId">;
 export type RequestId = Brand<string, "RequestId">;
 export type UserId = Brand<string, "UserId">;
 export type ToolId = Brand<string, "ToolId">;
+export type CapabilityId = Brand<string, "CapabilityId">;
 export type Sha256Digest = Brand<string, "Sha256Digest">;
 
 const idPatterns = {
@@ -41,6 +42,7 @@ const idPatterns = {
   request: /^req_[a-z0-9][a-z0-9-]{2,63}$/,
   user: /^usr_[a-z0-9][a-z0-9-]{2,63}$/,
   tool: /^tool_[a-z0-9][a-z0-9-]{2,63}$/,
+  capability: /^cap_[a-z0-9][a-z0-9-]{2,63}$/,
   digest: /^sha256:[0-9a-f]{64}$/
 } as const;
 
@@ -92,6 +94,8 @@ export const ids = {
     parseBranded<UserId>(value, idPatterns.user, "user ID"),
   tool: (value: string) =>
     parseBranded<ToolId>(value, idPatterns.tool, "tool ID"),
+  capability: (value: string) =>
+    parseBranded<CapabilityId>(value, idPatterns.capability, "capability ID"),
   digest: (value: string) =>
     parseBranded<Sha256Digest>(value, idPatterns.digest, "SHA-256 digest")
 } as const;

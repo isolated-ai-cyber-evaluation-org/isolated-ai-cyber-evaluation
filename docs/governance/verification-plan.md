@@ -17,8 +17,10 @@ Phase 01 verifies documents, JSON Schemas, synthetic examples, policy decision c
 | State machines | STATE-101..STATE-103 | terminal/replay/skip/reuse negative transitions |
 | Non-executable architecture | ARCH-201..ARCH-203 | prohibited imports/fields/artifacts、CI permissions、deny-only boundary |
 | Phase 2 traceability | TRACE-201 | Phase 2 requirement/design/artifact/test mapping |
+| Phase 3 Control Plane | P3-INT-001..010、ARCH-301..305 | local model→policy→mock path、Scope/ROE/approval/audit/stop/capability negative controls |
+| Phase 3 traceability | TRACE-301 | Phase 3 requirement/design/artifact/test mapping |
 
-## Phase 02 runtime suites
+## Later runtime suites
 
 - NET: route/egress/DNS/IPv4/IPv6/metadata/socket/Kubernetes API negative connectivity
 - ISO: microVM/VM boundary、host socket/mount/token absence、cross-engagement isolation
@@ -38,4 +40,5 @@ Each test result records command、tool/version、time、commit/artifact digest�
 
 Phase 01: all automated design suites pass; limitations are recorded in the active plan.  
 Phase 02 increments: the corresponding runtime suite passes before enabling the next dependency stage.  
+Phase 03: all P3 integration and architecture tests pass while external execution remains disabled.
 Pilot: independent security review confirms residual Critical risks have an authorized treatment.

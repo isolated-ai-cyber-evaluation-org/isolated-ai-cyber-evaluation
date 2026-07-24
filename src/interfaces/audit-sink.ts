@@ -1,7 +1,9 @@
 import type {
+  ApprovalId,
   EngagementId,
   ExecutionId,
-  Sha256Digest
+  Sha256Digest,
+  UserId
 } from "../domain/ids.ts";
 
 export interface AppendOnlyAuditEvent {
@@ -9,6 +11,9 @@ export interface AppendOnlyAuditEvent {
   readonly executionId?: ExecutionId;
   readonly eventType: string;
   readonly eventDigest: Sha256Digest;
+  readonly actionDigest: Sha256Digest;
+  readonly actorId: UserId;
+  readonly approvalId?: ApprovalId;
   readonly occurredAtEpochMs: number;
 }
 

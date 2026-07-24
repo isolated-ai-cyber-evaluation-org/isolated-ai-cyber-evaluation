@@ -1,6 +1,6 @@
 # Phase 03 — Local control-plane MVP
 
-Status: repository protection complete; maintainer onboarding and Phase 3 implementation pending  
+Status: local implementation and validation complete; publication pending authenticated maintainer push
 Owner: Principal Security Architect / Platform Engineering  
 Last updated: 2026-07-24
 
@@ -22,17 +22,40 @@ Last updated: 2026-07-24
 
 ## 実装項目
 
-- [ ] Engagement Service
-- [ ] Scope/ROE Service
-- [ ] Policy Engine adapter
-- [ ] Approval Service
-- [ ] Model Gateway abstractionとlocal fake
-- [ ] Tool Gateway mock
-- [ ] Credential Broker mock
-- [ ] model/Runner非依存Emergency Stop
-- [ ] append-only Audit event generation
-- [ ] composition rootとローカル統合test harness
-- [ ] Schema、architecture、traceability、文書更新
+- [x] Engagement Service
+- [x] Scope/ROE Service
+- [x] Policy Engine adapter
+- [x] Approval Service
+- [x] Model Gateway abstractionとlocal fake
+- [x] Tool Gateway mock
+- [x] Credential Broker mock
+- [x] model/Runner非依存Emergency Stop
+- [x] append-only Audit event generation
+- [x] composition rootとローカル統合test harness
+- [x] Schema、architecture、traceability、文書更新
+
+## 実装順序
+
+1. typed portとdomain recordを追加し、すべての操作を`engagement_id`へ束縛する。
+2. Scope/ROE、Approval、Audit、Emergency Stopをmemory-only serviceとして構成する。
+3. Policy adapter、Model Gateway fake、Tool Gateway mock、Credential Broker mockを接続する。
+4. audit intent append成功後にだけwrite stateとapproval useを変更するapplication serviceを構成する。
+5. unit/integration/architecture/traceability testと設計文書を同時に更新する。
+
+`write intent audit → policy decision → approval consume → state mutation → result audit`
+を規定順序とする。intent append失敗、policy不定、approval不一致、stop activeのいずれでも
+後続のstate mutationへ進まない。result audit失敗時はoperationを停止状態へ移し、
+成功として返さない。
+
+## 進捗
+
+- [x] protected public repositoryをローカルへclone
+- [x] protection記録branchを親に`agent/phase-03-control-plane-mvp`を作成
+- [x] Phase 1/2の必須設計文書、型、policy、state machine、architecture testを再確認
+- [x] TB-CP/TB-EP/TB-CR/TB-OP/TB-AIのPhase 3境界表現と既存ADRの適用範囲を確認
+- [x] MVP sourceとtestを実装
+- [x] `make validate`で全検証
+- [x] 差分をlocal commitとして固定し、認証済みmaintainer環境向けpatchを作成
 
 ## 強制制約
 
@@ -55,6 +78,20 @@ Last updated: 2026-07-24
 
 既存ADR-003、ADR-013、ADR-014の範囲内であり、製品・network・credential方式を新規選定しない。ローカルmemory-only compositionはADR-006の実装前段である。判断を変更する新規ADRは現時点で不要。
 
+## 判断事項
+
+- OpenAPIはlistenerを持たないcontractのままPhase 3へ更新し、全routeを`engagement_id`配下に置く。
+- Scope/ROE seedはlocal composition boundaryでSchema・署名検証済みとして扱う。この前提はASM-013/R-025で未解決とし、外部listener追加前に実verify pathを実装する。
+- 通常のrequester起点business writeはcontent-bound approvalをconsumeする。Approval lifecycle自体とauthority-reducing Emergency Stopは再帰承認を要求せず、engagement-bound auditを必須にする。
+- Tool GatewayはPolicy `PERMIT`でも`MOCK_EXECUTION_DISABLED`を返し、Execution Plane contractを追加しない。
+- Credential Broker mockはopaque capability metadataだけを返し、秘密値を表現するfieldを持たない。
+
+## リスク
+
+- R-024: public repositoryの履歴は回収不能であり、synthetic-onlyとsecret scanを継続する。
+- R-025: validated snapshot seedの仮定があるため、service listenerまたは外部manifest importへ昇格できない。
+- R-026: memory audit/stateはdurable transaction、WORM、crash recoveryを証明しない。
+
 ## 完了条件
 
 - Scope逸脱を拒否する。
@@ -67,7 +104,7 @@ Last updated: 2026-07-24
 
 ## 未解決事項
 
-- GitHub CLI device flowは対話端末出力をユーザーが閲覧できず未認証。別の対話端末またはユーザーローカル環境でのみ継続できる。
+- ユーザーのローカル環境ではGitHub CLI認証済みだが、このCodex workspaceとは認証を共有しない。検証済みcommitはbundleで引き渡し、認証済みmaintainer環境からpushする。
 - repository transferによりclassic branch protection ruleが消失したため、organization側に再作成した。required CI checkはactive rulesetとして再登録済みである。
 - 2 approvalsを実際に満たすには、repository owner以外に少なくとも2名の独立reviewerが必要である。collaborator/organization role assignmentは人間判断を要する。
 - public化以前にrepositoryへ含めた情報は公開済みとして扱う。実秘密、個人情報、内部限定情報を履歴へ追加しない（R-024）。
@@ -90,4 +127,10 @@ Last updated: 2026-07-24
 - Required-check ruleset: `main-required-validation`、ruleset ID `19654306`、status `Active`、target `Default` (`main`)、bypass list空
 - Ruleset controls: GitHub Actions由来required check `Validate non-executable skeleton`、up-to-date branch、delete禁止、force-push禁止
 - Pull request enforcement: PR `#2`で`All checks have passed`、`At least 2 approving reviews are required`、`Squash and merge` disabledを確認
-- Phase 3 implementation/integration tests: 未実行。repository protection preflightは完了。
+- Phase 3 source: local branch `agent/phase-03-control-plane-mvp`へ実装済み。
+- `make validate`: PASS。13 Schema compile/fixture/negative checks、11 Policy cases、18 unit tests、10 integration tests、API、architecture、Phase 2/3 traceability、docs、secret scanが成功。
+- `npm audit --audit-level=high`: PASS、0 vulnerabilities。
+- CycloneDX SBOM generation: 最初はlocal dependency tree未展開のため`ESBOMPROBLEMS`。`npm ci --ignore-scripts`後に再実行し、JSON parse PASS。
+- `git diff --check`: PASS。
+- prohibited source scan: shell/process/network module、`fetch`、`process.env`、raw command/URL/IP相当fieldを検出せず。
+- GitHub push/PR/required check: NOT EXECUTED。このworkspaceへユーザー認証を共有しないため、認証済みmaintainer環境で実施する。

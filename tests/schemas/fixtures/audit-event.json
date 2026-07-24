@@ -1,0 +1,10 @@
+{
+  "api_version": "cyber-eval.openai/v1",
+  "kind": "AuditEvent",
+  "engagement_id": "eng_control-mvp-001",
+  "event_type": "TOOL_REQUEST_ATTEMPT",
+  "event_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "action_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "actor_id": "usr_requester-001",
+  "occurred_at": "2026-07-24T10:00:00Z"
+}

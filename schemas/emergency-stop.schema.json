@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/emergency-stop.schema.json",
+  "title": "Control Plane emergency stop state",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "api_version",
+    "kind",
+    "engagement_id",
+    "state",
+    "reason_code",
+    "action_digest",
+    "activated_at"
+  ],
+  "properties": {
+    "api_version": {"const": "cyber-eval.openai/v1"},
+    "kind": {"const": "EmergencyStop"},
+    "engagement_id": {
+      "type": "string",
+      "pattern": "^eng_[a-z0-9][a-z0-9-]{2,63}$"
+    },
+    "state": {"const": "active"},
+    "reason_code": {
+      "enum": [
+        "OPERATOR_STOP",
+        "SCOPE_ESCAPE",
+        "AUDIT_UNAVAILABLE",
+        "POLICY_UNAVAILABLE",
+        "MONITORING_UNHEALTHY"
+      ]
+    },
+    "action_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "activated_at": {"type": "string", "format": "date-time"}
+  }
+}

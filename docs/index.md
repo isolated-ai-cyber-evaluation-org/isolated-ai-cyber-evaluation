@@ -32,6 +32,7 @@
 - [Incident response](governance/incident-response.md)
 - [Traceability matrix](governance/traceability-matrix.md)
 - [Phase 2 traceability](governance/phase-02-traceability.md)
+- [Phase 3 traceability](governance/phase-03-traceability.md)
 - [Verification plan](governance/verification-plan.md)
 
 ## Component design
@@ -59,6 +60,7 @@
 - Mermaid sources: [`diagrams/`](../diagrams/)
 - Architecture tests: [`tests/architecture/`](../tests/architecture/)
 - Policy tests: [`tests/policy/`](../tests/policy/)
+- Control Plane integration tests: [`tests/integration/`](../tests/integration/)
 - Schema tests: [`tests/schemas/`](../tests/schemas/)
 
 ## Status legend

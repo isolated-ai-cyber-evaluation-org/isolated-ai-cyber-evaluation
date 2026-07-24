@@ -4,7 +4,7 @@
 
 ## Phase
 
-現在は **Phase 02: Non-executable repository skeleton** である。Phase 1設計に加え、TypeScript型、IDベースAPI、純粋Policy判断、明示状態機械、deny-only stub、CIと負のテストを含む。実環境へのデプロイ、外部通信、shell/process実行、cloud/IaC、credential、脆弱性悪用、攻撃ツール実行は実装していない。
+現在は **Phase 03: Local Control Plane MVP** である。Phase 2骨格に加え、memory-onlyのEngagement、Scope/ROE、Policy adapter、Approval、Emergency Stop、監査、Model/Tool/Credential mockと統合テストを含む。HTTP listener、実環境へのデプロイ、外部通信、shell/process実行、cloud/IaC、実資格情報、脆弱性悪用、攻撃ツール実行は実装していない。
 
 ## Non-negotiable boundary
 
@@ -30,6 +30,7 @@
 - [API boundaries](docs/design/api-boundaries.md)
 - [Risk register](docs/security/risk-register.md)
 - [Traceability matrix](docs/governance/traceability-matrix.md)
+- [Phase 3 traceability](docs/governance/phase-03-traceability.md)
 - [Design review checklist](docs/reviews/design-review-checklist.md)
 
 ## Validation
@@ -39,7 +40,7 @@ npm ci
 make validate
 ```
 
-`make validate` はSchema、型、Scope/Approval/Policy停止、状態遷移、API、architecture invariant、文書リンク、Mermaidソースを検査する。IaC、コンテナ、VMイメージ、実行adapterは存在しないため、それらの検証は後続フェーズのゲートである。
+`make validate` はSchema、型、Scope/ROE/Approval/Policy/Stop、監査fail-close、状態遷移、API、architecture invariant、統合経路、文書リンクを検査する。IaC、コンテナ、VMイメージ、実行adapterは存在しないため、それらの検証は後続フェーズのゲートである。
 
 ## Safety
 

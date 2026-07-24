@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/audit-event.schema.json",
+  "title": "Append-only Control Plane audit event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "api_version",
+    "kind",
+    "engagement_id",
+    "event_type",
+    "event_digest",
+    "action_digest",
+    "actor_id",
+    "occurred_at"
+  ],
+  "properties": {
+    "api_version": {"const": "cyber-eval.openai/v1"},
+    "kind": {"const": "AuditEvent"},
+    "engagement_id": {
+      "type": "string",
+      "pattern": "^eng_[a-z0-9][a-z0-9-]{2,63}$"
+    },
+    "event_type": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9_]{2,63}$"
+    },
+    "event_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "action_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "actor_id": {
+      "type": "string",
+      "pattern": "^usr_[a-z0-9][a-z0-9-]{2,63}$"
+    },
+    "approval_id": {
+      "type": "string",
+      "pattern": "^apr_[a-z0-9][a-z0-9-]{2,63}$"
+    },
+    "occurred_at": {"type": "string", "format": "date-time"}
+  }
+}

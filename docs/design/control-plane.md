@@ -90,3 +90,26 @@ sequenceDiagram
 ## Administrative boundaries
 
 Control cluster administrators cannot read Broker master secrets or mutate OP evidence. Broker/HSM management is separate. Kubernetes, if used, hosts only control services; no Runner/range workloads, privileged pods, host sockets, wildcard RBAC, or public API endpoint.
+
+## Phase 3 local MVP realization
+
+| Component | Local artifact | Implemented control | Deliberately absent |
+| --- | --- | --- | --- |
+| Engagement Service | `src/services/local-engagement-service.ts` | explicit transitions、revision、approval consume、audit-before-mutation | database、HTTP listener |
+| Scope/ROE Service | `src/stubs/in-memory-scope-service.ts` | immutable snapshot lookup and binding | DSSE verifier、persistent store |
+| Policy adapter | `src/services/local-policy-engine-adapter.ts` | Scope/ROE cross-reference、time intersection、stop、fail-closed delegate | deployed OPA、bundle transport |
+| Approval Service | `src/services/local-approval-service.ts` | state machine、SoD、content binding、expiry、one use | OIDC/FIDO2 UI |
+| Model Gateway | `src/stubs/local-model-gateway-fake.ts` | profile allowlist、fixed proposal、audit | external model API |
+| Tool Gateway | `src/stubs/local-tool-gateway-mock.ts` | Policy mediation and mock-only result | Runner/adapter/network |
+| Credential Broker | `src/stubs/local-credential-broker-mock.ts` | target/purpose binding and opaque capability metadata | credential material、HSM/KMS |
+| Emergency Stop | `src/services/local-emergency-stop-service.ts` | per-engagement latch、audit-loss safety block | Runner fan-out |
+| Audit | `src/services/audit-event-factory.ts` | engagement/action/actor/event digest binding | OP transport、WORM |
+
+Normal requester-initiated business writes require a matching approved record.
+Approval creation/decision is the human governance mechanism itself and does not
+recursively require another approval. Emergency Stop is authority-reducing and always
+available without approval; both paths still require an append-only audit attempt.
+If stop audit append fails, the local latch enters `AUDIT_UNAVAILABLE` blocking state.
+
+Memory adapters are test-only implementations under ADR-006. They are not valid
+production stores, cryptographic signature validators or high-availability controls.
