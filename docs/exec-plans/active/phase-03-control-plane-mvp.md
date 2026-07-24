@@ -1,6 +1,6 @@
 # Phase 03 — Local control-plane MVP
 
-Status: blocked on required-check re-registration after repository transfer  
+Status: repository protection complete; maintainer onboarding and Phase 3 implementation pending  
 Owner: Principal Security Architect / Platform Engineering  
 Last updated: 2026-07-24
 
@@ -16,7 +16,7 @@ Last updated: 2026-07-24
 - [x] Phase 2 CIを成功させる
 - [x] signed commit、PR、2 approvals、stale approval dismissal、latest-push independent approval、conversation resolution、force-push/delete/bypass禁止を`main`へ再設定する
 - [x] 移管後のprotection設定をGitHub側から再読し、public repositoryの`main` 1 branchへ適用されることを検証する
-- [ ] 移管後のCI実行を発生させ、required check `Validate non-executable skeleton`とup-to-date branchを最終確認する
+- [x] 移管後のCI実行を発生させ、required check `Validate non-executable skeleton`とup-to-date branchを最終確認する
 
 前提ゲート完了前にPhase 3のMVP sourceを実装しない。
 
@@ -68,7 +68,7 @@ Last updated: 2026-07-24
 ## 未解決事項
 
 - GitHub CLI device flowは対話端末出力をユーザーが閲覧できず未認証。別の対話端末またはユーザーローカル環境でのみ継続できる。
-- repository transferによりclassic branch protection ruleが消失したため、organization側に再作成した。移管後のCI check contextを再登録するまでPhase 3実装を開始しない。
+- repository transferによりclassic branch protection ruleが消失したため、organization側に再作成した。required CI checkはactive rulesetとして再登録済みである。
 - 2 approvalsを実際に満たすには、repository owner以外に少なくとも2名の独立reviewerが必要である。collaborator/organization role assignmentは人間判断を要する。
 - public化以前にrepositoryへ含めた情報は公開済みとして扱う。実秘密、個人情報、内部限定情報を履歴へ追加しない（R-024）。
 
@@ -85,5 +85,9 @@ Last updated: 2026-07-24
 - Recreated classic branch protection rule ID: `80707009`
 - 再設定済み: PR必須、2 approvals、stale approval dismissal、latest-push independent approval、conversation resolution、signed commits、linear history、administrator bypass禁止、force push禁止、delete禁止
 - Enforcement verification: GitHub UIで`Currently applies to 1 branch`を確認し、private repository時の`Not enforced`表示がないことを確認
-- Pending verification: 移管後のPR CIを実行し、required check `Validate non-executable skeleton`を追加する
-- Phase 3 implementation/integration tests: 未実行。required-check再登録ゲートでfail-closed停止中。
+- Post-transfer verification PR: draft PR `#2`、head `fbe5147cf214a25c95aa48c28bfd02b252adaede`
+- Post-transfer CI: workflow run `30061661074`、job `Validate non-executable skeleton`が成功
+- Required-check ruleset: `main-required-validation`、ruleset ID `19654306`、status `Active`、target `Default` (`main`)、bypass list空
+- Ruleset controls: GitHub Actions由来required check `Validate non-executable skeleton`、up-to-date branch、delete禁止、force-push禁止
+- Pull request enforcement: PR `#2`で`All checks have passed`、`At least 2 approving reviews are required`、`Squash and merge` disabledを確認
+- Phase 3 implementation/integration tests: 未実行。repository protection preflightは完了。
