@@ -1,6 +1,6 @@
 # Phase 03 — Local control-plane MVP
 
-Status: blocked on repository protection preflight  
+Status: blocked on required-check re-registration after repository transfer  
 Owner: Principal Security Architect / Platform Engineering  
 Last updated: 2026-07-24
 
@@ -10,12 +10,13 @@ Last updated: 2026-07-24
 
 ## 前提ゲート
 
-- [x] Private GitHub repositoryを作成する
+- [x] GitHub Free organization配下のpublic repositoryを作成する
 - [x] `main`とGitHub署名済み初期commitを確認する
-- [ ] Phase 2基準treeをGitHubへ登録する
-- [ ] Phase 2 CIを成功させる
-- [ ] signed commit、PR、2 approvals、required checks、stale approval dismissal、conversation resolution、force-push/delete/bypass禁止を`main`へ設定する
-- [ ] protection設定をGitHub側から再読して検証する
+- [x] Phase 2基準treeをGitHubへ登録する
+- [x] Phase 2 CIを成功させる
+- [x] signed commit、PR、2 approvals、stale approval dismissal、latest-push independent approval、conversation resolution、force-push/delete/bypass禁止を`main`へ再設定する
+- [x] 移管後のprotection設定をGitHub側から再読し、public repositoryの`main` 1 branchへ適用されることを検証する
+- [ ] 移管後のCI実行を発生させ、required check `Validate non-executable skeleton`とup-to-date branchを最終確認する
 
 前提ゲート完了前にPhase 3のMVP sourceを実装しない。
 
@@ -66,10 +67,23 @@ Last updated: 2026-07-24
 
 ## 未解決事項
 
-- GitHub CLI device flowは対話端末出力をユーザーが閲覧できず未認証。GitHub接続機能とCloud Browserで前提ゲートを進める。
-- GitHub API経由commitが`Verified`になるかを基準commitで検証する。未署名ならR-020をcloseせず、Phase 3実装を停止する。
-- 個人private repositoryで要求したbranch protection機能が利用可能かはGitHub設定画面で確認する。
+- GitHub CLI device flowは対話端末出力をユーザーが閲覧できず未認証。別の対話端末またはユーザーローカル環境でのみ継続できる。
+- repository transferによりclassic branch protection ruleが消失したため、organization側に再作成した。移管後のCI check contextを再登録するまでPhase 3実装を開始しない。
+- 2 approvalsを実際に満たすには、repository owner以外に少なくとも2名の独立reviewerが必要である。collaborator/organization role assignmentは人間判断を要する。
+- public化以前にrepositoryへ含めた情報は公開済みとして扱う。実秘密、個人情報、内部限定情報を履歴へ追加しない（R-024）。
 
 ## 検証結果
 
-未実行。前提ゲート、実装、negative/integration test、未実行項目を順次記録する。
+- Public repository: `isolated-ai-cyber-evaluation-org/isolated-ai-cyber-evaluation`
+- Phase 2 bootstrap PR: `#1`
+- `main` Phase 2 commit: `c14cb8d4490ab1fa5b663e15756a30e1f4752bbe`
+- Commit signature: GitHub UIで`Verified`
+- GitHub Actions: `repository-skeleton-validation / Validate non-executable skeleton`が成功
+- Repository transfer: organization `isolated-ai-cyber-evaluation-org`へ完了
+- Visibility: GitHub connectorとGitHub UIで`public`を確認
+- Transfer finding: 移管前classic rule `80705248`はorganization repositoryへ引き継がれなかった
+- Recreated classic branch protection rule ID: `80707009`
+- 再設定済み: PR必須、2 approvals、stale approval dismissal、latest-push independent approval、conversation resolution、signed commits、linear history、administrator bypass禁止、force push禁止、delete禁止
+- Enforcement verification: GitHub UIで`Currently applies to 1 branch`を確認し、private repository時の`Not enforced`表示がないことを確認
+- Pending verification: 移管後のPR CIを実行し、required check `Validate non-executable skeleton`を追加する
+- Phase 3 implementation/integration tests: 未実行。required-check再登録ゲートでfail-closed停止中。
