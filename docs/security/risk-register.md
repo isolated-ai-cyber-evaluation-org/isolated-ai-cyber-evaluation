@@ -23,13 +23,20 @@ Scale: Likelihood (`L/M/H`), Impact (`L/M/H/Critical`). `Open-high` は実装開
 | R-017 | Evidence retention conflicts with minimization/deletion duties | M | H | classification/retention classes、legal hold、crypto-shred | duration/jurisdiction unknown | Legal + Privacy | Open-high: retention schedule |
 | R-018 | Emergency Stop itself is abused for availability attack | M | M | one-purpose identity、anti-replay、audit、resume review | false stops remain possible | SRE + SOC | Accept with SLO/capacity |
 | R-019 | Model safety classifier blocks legitimate defensive validation | M | M | bounded defensive prompts、clear authorization metadata、fallback to human review | provider behavior not controlled | AI Platform | Evaluate in pilot; no bypass |
-| R-020 | Repository is not initialized/configured for signed history | H | M | design docs track digests conceptually | no VCS/branch protection/signing today | Repository Owner | Open-high: required before Phase 3 or external collaboration |
+| R-020 | Repository is not initialized/configured for signed history | H | M | GitHub repository、GitHub-signed baseline、protected `main`、CI | local `gh` authentication and maintainer workstation setup remain incomplete | Repository Owner | Mitigated for hosted baseline; workstation onboarding remains |
 | R-021 | Phase 2 `PERMIT` result is mistaken for executable authorization | M | Critical | `execution_authorized=false` Schema/Rego、deny-only gateway、architecture test | future adapter could bypass gateway | Platform Security | Must remain blocking until execution-plane review |
 | R-022 | Test/in-memory stub is reused as a production adapter | M | H | no service entry point/runtime dependency、stub naming、CI architecture checks | future copy/paste outside repository controls | Engineering Owner | Review before any adapter implementation |
+| R-023 | Private personal repositoryのbranch protectionが保存されても強制されない | H | H | GitHub Free organizationへ移管してpublic化し、classic ruleとactive required-check rulesetをorganization側で再作成 | future transferでrulesが再び消失する可能性 | Repository Owner | Closed for Phase 3; reopen on transfer/visibility change |
+| R-024 | Public repositoryから設計情報、履歴、Actions logが恒久的に複製される | M | H | synthetic-only data、secret scan、public-content review、no credentials policy | clone、fork、cacheはvisibilityを戻しても回収不能 | Repository Owner + Security Governance | Open-high: public content acceptance and reviewer assignment |
+| R-025 | Phase 3 memory compositionへ未検証Scope/ROE snapshotを注入して署名検証を迂回 | M | Critical | composition-only seed、cross-reference/time/policy checks、ASM-013、production promotion禁止 | local caller is trusted; DSSE verification absent | Control Plane + AppSec | Must close before any service listener |
+| R-026 | memory-only audit/state更新がprocess crashで消失または部分完了する | H | H | audit-before-mutation ordering、one-shot tests、test-only namespace | durable transaction、WORM ack、recovery replay absent | SRE + Observability | Must close before persistent MVP |
 
 ## Risk acceptance rules
 
 - `Critical` residual risk cannot be accepted by the implementation team alone.
 - A risk owner、expiry、evidence、compensating controls、revisit triggerを記録しない「accepted」は無効である。
 - R-001、R-003、R-004、R-007、R-008、R-009、R-010、R-012、R-015、R-017はproduction-like pilotのblocking gateとする。
+- R-023はrepository transfer、visibility change、default branch change時に再検証する。
+- R-024は実秘密、個人情報、内部限定情報をpublic historyへ追加しない継続的gateとする。
+- R-025、R-026はPhase 3 local test processの外へadapterを公開する前のblocking gateとする。
 - 新たなroute、credential delivery、privileged host access、evidence mutation権限はリスク登録とADR更新なしに追加しない。

@@ -1,0 +1,9 @@
+{
+  "api_version": "cyber-eval.openai/v1",
+  "kind": "EmergencyStop",
+  "engagement_id": "eng_control-mvp-001",
+  "state": "active",
+  "reason_code": "OPERATOR_STOP",
+  "action_digest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "activated_at": "2026-07-24T10:00:00Z"
+}

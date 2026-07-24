@@ -1,0 +1,11 @@
+{
+  "api_version": "cyber-eval.openai/v1",
+  "kind": "CapabilityGrant",
+  "capability_id": "cap_synthetic-001",
+  "engagement_id": "eng_control-mvp-001",
+  "target_id": "tgt_synthetic-web-001",
+  "purpose_profile_id": "profile_capability-purpose-001",
+  "issued_at": "2026-07-24T10:00:00Z",
+  "expires_at": "2026-07-24T10:05:00Z",
+  "state": "active"
+}

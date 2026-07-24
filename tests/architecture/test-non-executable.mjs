@@ -28,6 +28,7 @@ const prohibitedNodeModules = new Set([
   "node:tls",
   "node:worker_threads"
 ]);
+const allowedNodeModules = new Set(["node:crypto"]);
 const prohibitedPackagePrefixes = [
   "@aws-sdk/",
   "@azure/",
@@ -44,8 +45,8 @@ for (const file of sourceFiles) {
     const imported = match[1];
     assert.ok(!prohibitedNodeModules.has(imported), `${relative} imports ${imported}`);
     assert.ok(
-      imported.startsWith("."),
-      `${relative} must use relative, pure-domain imports only: ${imported}`
+      imported.startsWith(".") || allowedNodeModules.has(imported),
+      `${relative} imports an unapproved runtime module: ${imported}`
     );
     for (const prefix of prohibitedPackagePrefixes) {
       assert.ok(!imported.startsWith(prefix), `${relative} imports ${prefix}`);
@@ -74,6 +75,29 @@ const gateway = fs.readFileSync(
 );
 assert.ok(gateway.includes("EXECUTION_DISABLED"));
 assert.ok(gateway.includes("POLICY_INDETERMINATE"));
+const localGateway = fs.readFileSync(
+  path.join(root, "src/stubs/local-tool-gateway-mock.ts"),
+  "utf8"
+);
+assert.ok(localGateway.includes("#policyAdapter.authorize"));
+assert.ok(localGateway.includes("MOCK_EXECUTION_DISABLED"));
+
+const capabilityMock = fs.readFileSync(
+  path.join(root, "src/stubs/local-credential-broker-mock.ts"),
+  "utf8"
+);
+for (const materialField of [
+  "credentialValue",
+  "password:",
+  "privateKey:",
+  "secret:",
+  "token:"
+]) {
+  assert.ok(
+    !capabilityMock.includes(materialField),
+    `capability mock declares material field ${materialField}`
+  );
+}
 
 const policySchema = JSON.parse(
   fs.readFileSync(path.join(root, "schemas/policy-decision.schema.json"), "utf8")
@@ -83,7 +107,7 @@ const jobSchema = JSON.parse(
   fs.readFileSync(path.join(root, "schemas/job.schema.json"), "utf8")
 );
 assert.equal(jobSchema.properties.execution_mode.const, "disabled");
-process.stdout.write("PASS ARCH-203 Policy permit remains non-executable\n");
+process.stdout.write("PASS ARCH-203 Policy permit remains mock-only and non-executable\n");
 
 const prohibitedArtifacts = walk(root)
   .map((name) => path.relative(root, name))
@@ -96,7 +120,7 @@ const prohibitedArtifacts = walk(root)
 assert.deepEqual(prohibitedArtifacts, [], "no shell/IaC/container implementation allowed");
 
 process.stdout.write(
-  `PASS ARCH-201 non-executable source boundary (${sourceFiles.length} TypeScript files)\n`
+  `PASS ARCH-201 local-only non-execution boundary (${sourceFiles.length} TypeScript files)\n`
 );
 
 const workflowPath = path.join(root, ".github/workflows/ci.yml");
@@ -121,6 +145,7 @@ for (const script of [
   "test:schemas",
   "test:policy",
   "test:unit",
+  "test:integration",
   "test:api",
   "test:architecture",
   "test:traceability",
@@ -131,7 +156,13 @@ for (const script of [
   assert.equal(typeof packageScripts[script], "string", `missing script ${script}`);
 }
 const makefile = fs.readFileSync(path.join(root, "Makefile"), "utf8");
-for (const target of ["validate:", "test-unit:", "test-api:", "test-traceability:"]) {
+for (const target of [
+  "validate:",
+  "test-unit:",
+  "test-integration:",
+  "test-api:",
+  "test-traceability:"
+]) {
   assert.ok(makefile.includes(target), `missing Makefile target ${target}`);
 }
 process.stdout.write("PASS CI-001 local and CI validation harness entrypoints\n");

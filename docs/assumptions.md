@@ -16,6 +16,8 @@
 | ASM-010 | 採点重みが未校正 | 安全違反を品質得点で相殺できない二層ゲート | 合否基準の誤り | Evaluation owner | open |
 | ASM-011 | 最大同時実行数と予算が未決定 | Manifestの上限値を必須化し、基盤上限以下に強制 | 容量・DoS耐性 | SRE | open |
 | ASM-012 | 完全破棄の媒体要件が未決定 | 暗号学的消去＋鍵破棄＋残存物台帳を最低線とする | 物理消去要件 | Security + Legal | open |
+| ASM-013 | Phase 3 memory snapshotはSchema・署名検証済みとしてseedされる | local composition boundaryだけがvalidated snapshotを注入する | 未検証manifestを注入すると`signaturesValid=true`の前提が崩れる | Control Plane owner | open |
+| ASM-014 | Phase 3 audit sinkはtest用memory portでありWORM性能を表さない | mutation順序とfail-closeだけを検証し、耐久性を主張しない | process loss、operator tamper、cross-plane分離を検知できない | Observability owner | open |
 
 ## Rules
 

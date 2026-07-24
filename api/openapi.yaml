@@ -1,17 +1,19 @@
 openapi: 3.1.0
 info:
-  title: Isolated AI Cyber Evaluation Skeleton
-  version: 0.2.0
-  description: Interface-only contract. No server or execution adapter exists.
-x-phase: repository-skeleton
+  title: Isolated AI Cyber Evaluation Control Plane
+  version: 0.3.0
+  description: Local Control Plane interface contract. No server or execution adapter exists.
+x-phase: local-control-plane-mvp
 x-execution-enabled: false
 security:
   - workloadMTLS: []
 paths:
-  /v1/engagement:
+  /v1/engagements/{engagement_id}:
     get:
       operationId: getEngagement
       summary: Read the current immutable engagement summary.
+      parameters:
+        - $ref: "#/components/parameters/EngagementId"
       responses:
         "200":
           description: Synthetic engagement summary.
@@ -19,10 +21,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EngagementSummary"
-  /v1/authorized-targets:
+  /v1/engagements/{engagement_id}/authorized-targets:
     get:
       operationId: getAuthorizedTargets
       summary: List opaque target IDs in the signed Scope.
+      parameters:
+        - $ref: "#/components/parameters/EngagementId"
       responses:
         "200":
           description: Authorized target IDs.
@@ -32,11 +36,12 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/TargetId"
-  /v1/allowed-test-cases:
+  /v1/engagements/{engagement_id}/allowed-test-cases:
     get:
       operationId: getAllowedTestCases
       summary: List test-case IDs allowed for an optional target ID.
       parameters:
+        - $ref: "#/components/parameters/EngagementId"
         - name: target_id
           in: query
           required: false
@@ -52,10 +57,12 @@ paths:
                 items:
                   type: string
                   pattern: ^tc_[a-z0-9][a-z0-9-]{2,63}$
-  /v1/tool-requests:
+  /v1/engagements/{engagement_id}/tool-requests:
     post:
       operationId: requestTool
       summary: Submit an ID-only request to the deny-only Tool Gateway.
+      parameters:
+        - $ref: "#/components/parameters/EngagementId"
       requestBody:
         required: true
         content:
@@ -82,12 +89,12 @@ paths:
             pattern: ^eng_[a-z0-9][a-z0-9-]{2,63}$
       responses:
         "202":
-          description: Termination intent accepted by the stub state machine.
+          description: Termination intent accepted by the local state service.
 components:
   securitySchemes:
     workloadMTLS:
       type: mutualTLS
-      description: Declarative future requirement; no credentials are handled in Phase 2.
+      description: Declarative future requirement; the local MVP handles no credential material.
   schemas:
     TargetId:
       type: string
@@ -132,3 +139,11 @@ components:
             - DENY
             - INDETERMINATE
             - TERMINATE
+  parameters:
+    EngagementId:
+      name: engagement_id
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^eng_[a-z0-9][a-z0-9-]{2,63}$

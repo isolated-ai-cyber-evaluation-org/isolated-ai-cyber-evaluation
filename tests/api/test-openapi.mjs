@@ -9,22 +9,23 @@ const openapiPath = path.join(root, "api/openapi.yaml");
 const api = parseYaml(fs.readFileSync(openapiPath, "utf8"), {uniqueKeys: true});
 
 assert.equal(api.openapi, "3.1.0");
-assert.equal(api["x-phase"], "repository-skeleton");
+assert.equal(api["x-phase"], "local-control-plane-mvp");
 assert.equal(api["x-execution-enabled"], false);
-assert.equal(api.servers, undefined, "Phase 2 must not declare a reachable server");
+assert.equal(api.servers, undefined, "MVP must not declare a reachable server");
 assert.deepEqual(api.security, [{workloadMTLS: []}]);
 assert.equal(api.components.securitySchemes.workloadMTLS.type, "mutualTLS");
 
 const expectedPaths = [
-  "/v1/engagement",
-  "/v1/authorized-targets",
-  "/v1/allowed-test-cases",
-  "/v1/tool-requests",
+  "/v1/engagements/{engagement_id}",
+  "/v1/engagements/{engagement_id}/authorized-targets",
+  "/v1/engagements/{engagement_id}/allowed-test-cases",
+  "/v1/engagements/{engagement_id}/tool-requests",
   "/v1/engagements/{engagement_id}/terminate"
 ];
 assert.deepEqual(Object.keys(api.paths).sort(), expectedPaths.sort());
 
-const externalRef = api.paths["/v1/tool-requests"].post.requestBody
+const externalRef = api.paths["/v1/engagements/{engagement_id}/tool-requests"]
+  .post.requestBody
   .content["application/json"].schema.$ref;
 const resolvedRef = path.resolve(path.dirname(openapiPath), externalRef);
 assert.ok(fs.existsSync(resolvedRef), `missing external Schema ${externalRef}`);
@@ -68,8 +69,12 @@ for (const variant of toolVariants) {
 }
 
 for (const route of Object.keys(api.paths)) {
+  assert.ok(
+    route.includes("{engagement_id}"),
+    `operation route lacks engagement binding: ${route}`
+  );
   assert.ok(!route.includes("shell"));
   assert.ok(!route.includes("proxy"));
   assert.ok(!route.includes("cloud"));
 }
-process.stdout.write("PASS API-001 OpenAPI is ID-only and non-executable\n");
+process.stdout.write("PASS API-001 OpenAPI is engagement-bound, ID-only, and non-executable\n");

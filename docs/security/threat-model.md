@@ -127,3 +127,20 @@ Phase 2 does not instantiate the four planes or expose an attackable service. It
 | dependency or CI compromise changes the skeleton | exact dependency versions、lockfile、ignored lifecycle scripts、read-only SHA-pinned CI | registry/build-platform compromise remains; R-010 |
 
 Network isolation、credential non-exposure、WORM evidence and destruction are still design assertions because their components are deliberately absent. Phase 2 tests must not be cited as runtime control effectiveness evidence.
+
+## 11. Phase 3 local MVP threat posture
+
+Phase 3 adds stateful Control Plane logic but no new network route or execution surface.
+Its tests establish local authorization behavior only:
+
+| Threat | Local control | Residual |
+| --- | --- | --- |
+| expired or mismatched ROE is ignored | Policy adapter intersects Engagement/ROE windows and verifies bindings | signature verification is an injected-store assumption; R-025 |
+| audit outage still mutates state | every exposed mutation appends an attempt first; failure throws before update | process crash and cross-store atomicity are not solved; R-026 |
+| self approval or approval replay | Approval state machine、requester/approver separation、one-shot consume | real human identity/session assurance absent |
+| compromised model broadens destination | fixed fake proposal、ID union、Scope checks、mock-only gateway | external prompt/model behavior not evaluated |
+| Broker mock leaks sensitive material | opaque metadata type/schema and prohibited-field tests | real Broker、HSM and adapter memory boundary absent |
+| stop depends on model/Runner | direct per-engagement Control Plane latch | distributed fan-out and recovery absent |
+
+The local MVP must not be interpreted as evidence for network isolation、WORM、
+credential secrecy、Runner containment or destructive cleanup.

@@ -15,6 +15,9 @@ const schemaFiles = fs.readdirSync(path.join(root, "schemas"))
   .sort();
 const requiredSchemas = [
   "approval.schema.json",
+  "audit-event.schema.json",
+  "capability-grant.schema.json",
+  "emergency-stop.schema.json",
   "engagement.schema.json",
   "evidence.schema.json",
   "finding.schema.json",
@@ -53,6 +56,9 @@ validate("roe", roe, "examples/roe.yaml");
 validate("scenario", scenario, "examples/scenario.yaml");
 
 for (const kind of [
+  "audit-event",
+  "capability-grant",
+  "emergency-stop",
   "finding",
   "evidence",
   "approval",
@@ -120,4 +126,30 @@ const badJob = JSON.parse(
 );
 badJob.execution_mode = "enabled";
 assert.equal(validators.get("job")(badJob), false, "job execution must remain disabled");
+
+const badCapability = JSON.parse(
+  fs.readFileSync(
+    path.join(root, "tests/schemas/fixtures/capability-grant.json"),
+    "utf8"
+  )
+);
+badCapability.value = "not-permitted";
+assert.equal(
+  validators.get("capability-grant")(badCapability),
+  false,
+  "capability metadata must reject material-bearing fields"
+);
+
+const badAudit = JSON.parse(
+  fs.readFileSync(
+    path.join(root, "tests/schemas/fixtures/audit-event.json"),
+    "utf8"
+  )
+);
+delete badAudit.engagement_id;
+assert.equal(
+  validators.get("audit-event")(badAudit),
+  false,
+  "audit event must remain engagement-bound"
+);
 process.stdout.write("PASS SCH-004 negative schema controls\n");
