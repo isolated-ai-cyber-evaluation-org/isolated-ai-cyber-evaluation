@@ -1,0 +1,29 @@
+{
+  "api_version": "cyber-eval.openai/v1",
+  "kind": "Evidence",
+  "metadata": {
+    "id": "ev_synthetic-result-001"
+  },
+  "spec": {
+    "engagement_id": "eng_synthetic-web-001",
+    "execution_id": "exe_synthetic-001",
+    "target_id": "tgt_web-app-001",
+    "type": "tool-result",
+    "classification": "synthetic",
+    "content_hash": "sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+    "size_bytes": 512,
+    "producer_identity": "spiffe://execution.example/runner/synthetic-001",
+    "collected_at": "2026-07-23T01:00:00Z",
+    "ingested_at": "2026-07-23T01:00:01Z",
+    "storage_ref": "evidence://ev_synthetic-result-001",
+    "retention_class": "engagement-standard",
+    "chain_of_custody": [
+      {
+        "event": "collected",
+        "actor": "spiffe://execution.example/runner/synthetic-001",
+        "at": "2026-07-23T01:00:00Z",
+        "digest": "sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+      }
+    ]
+  }
+}

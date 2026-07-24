@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/engagement.schema.json",
+  "title": "Cyber evaluation engagement",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["api_version", "kind", "metadata", "spec", "signature"],
+  "properties": {
+    "api_version": {"const": "cyber-eval.openai/v1"},
+    "kind": {"const": "Engagement"},
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "generation", "created_at", "expires_at"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^eng_[a-z0-9][a-z0-9-]{2,63}$"},
+        "generation": {"type": "integer", "minimum": 1},
+        "created_at": {"type": "string", "format": "date-time"},
+        "expires_at": {"type": "string", "format": "date-time"},
+        "labels": {
+          "type": "object",
+          "propertyNames": {"pattern": "^[a-z][a-z0-9_.-]{0,63}$"},
+          "additionalProperties": {"type": "string", "maxLength": 128}
+        }
+      }
+    },
+    "spec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "objective",
+        "mode",
+        "status",
+        "owner_role_ids",
+        "roe_id",
+        "scenario_ids",
+        "target_ids",
+        "allowed_test_case_ids",
+        "model_profile_id",
+        "environment",
+        "data_classification",
+        "budgets"
+      ],
+      "properties": {
+        "title": {"type": "string", "minLength": 3, "maxLength": 160},
+        "objective": {"type": "string", "minLength": 10, "maxLength": 2000},
+        "mode": {"enum": ["white-box", "gray-box"]},
+        "status": {"enum": ["draft", "submitted", "authorized", "ready", "suspended"]},
+        "owner_role_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^role_[a-z0-9][a-z0-9-]{2,63}$"}
+        },
+        "roe_id": {"type": "string", "pattern": "^roe_[a-z0-9][a-z0-9-]{2,63}$"},
+        "scenario_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^scn_[a-z0-9][a-z0-9-]{2,63}$"}
+        },
+        "target_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^tgt_[a-z0-9][a-z0-9-]{2,63}$"}
+        },
+        "allowed_test_case_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^tc_[a-z0-9][a-z0-9-]{2,63}$"}
+        },
+        "model_profile_id": {"type": "string", "pattern": "^mdl_[a-z0-9][a-z0-9-]{2,63}$"},
+        "environment": {"enum": ["isolated-local", "isolated-cloud"]},
+        "data_classification": {"const": "synthetic"},
+        "budgets": {"$ref": "#/$defs/budgets"}
+      }
+    },
+    "signature": {"$ref": "#/$defs/signature"}
+  },
+  "$defs": {
+    "budgets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "max_duration_seconds",
+        "max_tool_calls",
+        "max_model_tokens",
+        "max_parallel_jobs",
+        "max_data_bytes",
+        "max_requests",
+        "max_request_rate_per_second"
+      ],
+      "properties": {
+        "max_duration_seconds": {"type": "integer", "minimum": 1, "maximum": 86400},
+        "max_tool_calls": {"type": "integer", "minimum": 1, "maximum": 10000},
+        "max_model_tokens": {"type": "integer", "minimum": 1, "maximum": 2000000},
+        "max_parallel_jobs": {"type": "integer", "minimum": 1, "maximum": 64},
+        "max_data_bytes": {"type": "integer", "minimum": 1, "maximum": 10737418240},
+        "max_requests": {"type": "integer", "minimum": 1, "maximum": 1000000},
+        "max_request_rate_per_second": {"type": "number", "exclusiveMinimum": 0, "maximum": 1000}
+      }
+    },
+    "signature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["format", "algorithm", "key_id", "payload_digest", "value"],
+      "properties": {
+        "format": {"const": "dsse"},
+        "algorithm": {"const": "Ed25519"},
+        "key_id": {"type": "string", "pattern": "^key_[a-z0-9][a-z0-9-]{2,63}$"},
+        "payload_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "value": {"type": "string", "pattern": "^[A-Za-z0-9+/]{16,}={0,2}$"}
+      }
+    }
+  }
+}

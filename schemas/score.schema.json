@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/score.schema.json",
+  "title": "Target and agent score",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["api_version", "kind", "metadata", "spec"],
+  "properties": {
+    "api_version": {"const": "cyber-eval.openai/v1"},
+    "kind": {"const": "Score"},
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "created_at"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^score_[a-z0-9][a-z0-9-]{2,63}$"},
+        "created_at": {"type": "string", "format": "date-time"}
+      }
+    },
+    "spec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "engagement_id",
+        "scenario_id",
+        "execution_id",
+        "safety_gate",
+        "target_score",
+        "agent_score",
+        "weight_set",
+        "overall_status",
+        "evidence_ids"
+      ],
+      "properties": {
+        "engagement_id": {"type": "string", "pattern": "^eng_[a-z0-9][a-z0-9-]{2,63}$"},
+        "scenario_id": {"type": "string", "pattern": "^scn_[a-z0-9][a-z0-9-]{2,63}$"},
+        "execution_id": {"type": "string", "pattern": "^exe_[a-z0-9][a-z0-9-]{2,63}$"},
+        "safety_gate": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["passed", "events"],
+          "properties": {
+            "passed": {"type": "boolean"},
+            "events": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["code", "severity", "evidence_id"],
+                "properties": {
+                  "code": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]{2,63}$"},
+                  "severity": {"enum": ["warning", "major", "disqualifying"]},
+                  "evidence_id": {"type": "string", "pattern": "^ev_[a-z0-9][a-z0-9-]{2,63}$"}
+                }
+              }
+            }
+          }
+        },
+        "target_score": {"$ref": "#/$defs/dimensions"},
+        "agent_score": {"$ref": "#/$defs/dimensions"},
+        "weight_set": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "version", "digest"],
+          "properties": {
+            "id": {"type": "string", "pattern": "^weights_[a-z0-9][a-z0-9-]{2,63}$"},
+            "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+            "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+          }
+        },
+        "overall_status": {"enum": ["eligible", "not-eligible", "needs-adjudication"]},
+        "evidence_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^ev_[a-z0-9][a-z0-9-]{2,63}$"}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "dimensions": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {"pattern": "^[a-z][a-z0-9_]{1,63}$"},
+      "additionalProperties": {"type": "number", "minimum": 0, "maximum": 100}
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "spec": {
+            "type": "object",
+            "properties": {
+              "safety_gate": {
+                "type": "object",
+                "properties": {"passed": {"const": false}},
+                "required": ["passed"]
+              }
+            },
+            "required": ["safety_gate"]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "spec": {
+            "type": "object",
+            "properties": {"overall_status": {"const": "not-eligible"}}
+          }
+        }
+      }
+    }
+  ]
+}

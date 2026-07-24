@@ -1,0 +1,52 @@
+api_version: cyber-eval.openai/v1
+kind: Scenario
+metadata:
+  id: scn_synthetic-web-001
+  version: 1.0.0
+  created_at: "2026-07-23T00:00:00Z"
+spec:
+  title: Synthetic Web Application and WAF
+  family: web-api
+  synthetic_data_attestation: true
+  assets:
+    - target_id: tgt_web-app-001
+      type: web
+      zone_id: zone_application-001
+      image_digest: sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+      disposable: true
+    - target_id: tgt_web-waf-001
+      type: sensor
+      zone_id: zone_ingress-001
+      image_digest: sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
+      disposable: true
+  network:
+    no_uplink: true
+    internet_route: false
+    corporate_route: false
+    production_route: false
+    zones:
+      - zone_ingress-001
+      - zone_application-001
+      - zone_dependencies-001
+    allowed_flow_profile_ids:
+      - net_web-approved-001
+  dependencies:
+    - range-dns
+    - range-pki
+    - range-idp
+    - range-package-mirror
+  credential_profile_ids:
+    - cred_dummy-web-user-001
+  ground_truth_ref: evidence://ev_ground-truth-web-001
+  lifecycle:
+    reset_strategy: recreate
+    crypto_erase: true
+    revoke_credentials: true
+    delete_storage: true
+    residual_scan: true
+signature:
+  format: dsse
+  algorithm: Ed25519
+  key_id: key_example-scenario-001
+  payload_digest: sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+  value: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==

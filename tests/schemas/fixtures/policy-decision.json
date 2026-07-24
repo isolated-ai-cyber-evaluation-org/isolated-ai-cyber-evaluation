@@ -1,0 +1,10 @@
+{
+  "api_version": "cyber-eval.openai/v1",
+  "kind": "PolicyDecision",
+  "decision_id": "pdec_synthetic-001",
+  "engagement_id": "eng_synthetic-web-001",
+  "result": "PERMIT",
+  "reason_code": "ALL_CONTROLS_SATISFIED",
+  "policy_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+  "execution_authorized": false
+}

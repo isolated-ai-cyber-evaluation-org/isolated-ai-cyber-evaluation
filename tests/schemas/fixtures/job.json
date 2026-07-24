@@ -1,0 +1,11 @@
+{
+  "api_version": "cyber-eval.openai/v1",
+  "kind": "Job",
+  "job_id": "job_synthetic-001",
+  "engagement_id": "eng_synthetic-web-001",
+  "scope_generation": 1,
+  "scope_digest": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+  "policy_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+  "state": "PLANNED",
+  "execution_mode": "disabled"
+}

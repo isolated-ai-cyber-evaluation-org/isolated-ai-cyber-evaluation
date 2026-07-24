@@ -1,0 +1,19 @@
+sequenceDiagram
+  participant Detector as OP detector / EP watchdog
+  participant Stop as Emergency Stop
+  participant FW as Egress firewall
+  participant Broker as Credential Broker
+  participant Runner as Runner lifecycle
+  participant Evidence as OP evidence
+  Detector->>Stop: signed stop reason
+  par block execution
+    Stop->>FW: revoke leases and drop traffic
+  and revoke identity
+    Stop->>Broker: revoke handles/sessions/tokens
+  and quarantine
+    Stop->>Runner: freeze and quarantine
+  end
+  Runner->>Evidence: bounded final telemetry
+  Evidence-->>Runner: seal acknowledgement or timeout
+  Runner->>Runner: destroy and erase key
+  Evidence-->>Stop: immutable incident/destruction status

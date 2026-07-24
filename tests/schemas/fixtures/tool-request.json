@@ -1,0 +1,11 @@
+{
+  "api_version": "cyber-eval.openai/v1",
+  "kind": "ToolRequest",
+  "request_id": "req_synthetic-001",
+  "engagement_id": "eng_synthetic-web-001",
+  "tool_request": {
+    "tool": "run_web_test",
+    "target_id": "tgt_web-app-001",
+    "test_case_id": "tc_web-safe-001"
+  }
+}

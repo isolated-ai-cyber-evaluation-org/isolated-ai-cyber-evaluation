@@ -1,0 +1,17 @@
+flowchart TB
+  CP["Control producer"]
+  EP["Execution producer"]
+  CR["Range sensor gateway"]
+  Ingest["OP append-only ingest"]
+  Raw["Immutable raw WORM"]
+  Index["SIEM / indexes"]
+  Score["Scoring and review"]
+  CP -->|create only| Ingest
+  EP -->|create only| Ingest
+  CR -->|one-way sensor path| Ingest
+  Ingest --> Raw
+  Raw --> Index
+  Raw --> Score
+  CP x--x Raw
+  EP x--x Raw
+  CR x--x Raw

@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/scenario.schema.json",
+  "title": "Disposable cyber range scenario",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["api_version", "kind", "metadata", "spec", "signature"],
+  "properties": {
+    "api_version": {"const": "cyber-eval.openai/v1"},
+    "kind": {"const": "Scenario"},
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "created_at"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^scn_[a-z0-9][a-z0-9-]{2,63}$"},
+        "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+        "created_at": {"type": "string", "format": "date-time"}
+      }
+    },
+    "spec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "family",
+        "synthetic_data_attestation",
+        "assets",
+        "network",
+        "dependencies",
+        "credential_profile_ids",
+        "ground_truth_ref",
+        "lifecycle"
+      ],
+      "properties": {
+        "title": {"type": "string", "minLength": 3, "maxLength": 160},
+        "family": {"enum": ["web-api", "linux-network", "windows-domain", "container-kubernetes", "cloud-configuration"]},
+        "synthetic_data_attestation": {"const": true},
+        "assets": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["target_id", "type", "zone_id", "image_digest", "disposable"],
+            "properties": {
+              "target_id": {"type": "string", "pattern": "^tgt_[a-z0-9][a-z0-9-]{2,63}$"},
+              "type": {"enum": ["web", "api", "linux", "windows", "container", "kubernetes", "cloud-simulator", "sensor"]},
+              "zone_id": {"type": "string", "pattern": "^zone_[a-z0-9][a-z0-9-]{2,63}$"},
+              "image_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+              "disposable": {"const": true}
+            }
+          }
+        },
+        "network": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["no_uplink", "internet_route", "corporate_route", "production_route", "zones", "allowed_flow_profile_ids"],
+          "properties": {
+            "no_uplink": {"const": true},
+            "internet_route": {"const": false},
+            "corporate_route": {"const": false},
+            "production_route": {"const": false},
+            "zones": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {"type": "string", "pattern": "^zone_[a-z0-9][a-z0-9-]{2,63}$"}
+            },
+            "allowed_flow_profile_ids": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {"type": "string", "pattern": "^net_[a-z0-9][a-z0-9-]{2,63}$"}
+            }
+          }
+        },
+        "dependencies": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"enum": ["range-dns", "range-pki", "range-idp", "range-package-mirror", "range-time", "synthetic-event-sink"]}
+        },
+        "credential_profile_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^cred_[a-z0-9][a-z0-9-]{2,63}$"}
+        },
+        "ground_truth_ref": {"type": "string", "pattern": "^evidence://ev_[a-z0-9][a-z0-9-]{2,63}$"},
+        "lifecycle": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["reset_strategy", "crypto_erase", "revoke_credentials", "delete_storage", "residual_scan"],
+          "properties": {
+            "reset_strategy": {"const": "recreate"},
+            "crypto_erase": {"const": true},
+            "revoke_credentials": {"const": true},
+            "delete_storage": {"const": true},
+            "residual_scan": {"const": true}
+          }
+        }
+      }
+    },
+    "signature": {"$ref": "#/$defs/signature"}
+  },
+  "$defs": {
+    "signature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["format", "algorithm", "key_id", "payload_digest", "value"],
+      "properties": {
+        "format": {"const": "dsse"},
+        "algorithm": {"const": "Ed25519"},
+        "key_id": {"type": "string", "pattern": "^key_[a-z0-9][a-z0-9-]{2,63}$"},
+        "payload_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "value": {"type": "string", "pattern": "^[A-Za-z0-9+/]{16,}={0,2}$"}
+      }
+    }
+  }
+}

@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/tool-request.schema.json",
+  "title": "Model-visible ID-only tool request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["api_version", "kind", "request_id", "engagement_id", "tool_request"],
+  "properties": {
+    "api_version": {"const": "cyber-eval.openai/v1"},
+    "kind": {"const": "ToolRequest"},
+    "request_id": {"type": "string", "pattern": "^req_[a-z0-9][a-z0-9-]{2,63}$"},
+    "engagement_id": {"type": "string", "pattern": "^eng_[a-z0-9][a-z0-9-]{2,63}$"},
+    "tool_request": {"$ref": "#/$defs/model_tool_request"}
+  },
+  "$defs": {
+    "model_tool_request": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["tool"],
+          "properties": {"tool": {"const": "get_engagement"}}
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["tool"],
+          "properties": {"tool": {"const": "get_authorized_targets"}}
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["tool"],
+          "properties": {
+            "tool": {"const": "get_allowed_test_cases"},
+            "target_id": {"$ref": "#/$defs/target_id"}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["tool", "repository_id", "profile_id"],
+          "properties": {
+            "tool": {"const": "run_static_analysis"},
+            "repository_id": {"type": "string", "pattern": "^repo_[a-z0-9][a-z0-9-]{2,63}$"},
+            "profile_id": {"$ref": "#/$defs/profile_id"}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["tool", "target_id", "profile_id"],
+          "properties": {
+            "tool": {"const": "run_safe_network_discovery"},
+            "target_id": {"$ref": "#/$defs/target_id"},
+            "profile_id": {"$ref": "#/$defs/profile_id"}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["tool", "target_id", "test_case_id"],
+          "properties": {
+            "tool": {"const": "run_web_test"},
+            "target_id": {"$ref": "#/$defs/target_id"},
+            "test_case_id": {"type": "string", "pattern": "^tc_[a-z0-9][a-z0-9-]{2,63}$"}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["tool", "target_id", "poc_id"],
+          "properties": {
+            "tool": {"const": "request_poc_validation"},
+            "target_id": {"$ref": "#/$defs/target_id"},
+            "poc_id": {"type": "string", "pattern": "^poc_[a-z0-9][a-z0-9-]{2,63}$"}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["tool", "execution_id"],
+          "properties": {
+            "tool": {"const": "collect_evidence"},
+            "execution_id": {"type": "string", "pattern": "^exe_[a-z0-9][a-z0-9-]{2,63}$"}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["tool", "finding_id"],
+          "properties": {
+            "tool": {"const": "propose_patch"},
+            "finding_id": {"type": "string", "pattern": "^find_[a-z0-9][a-z0-9-]{2,63}$"}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["tool", "patch_id", "test_suite_id"],
+          "properties": {
+            "tool": {"const": "validate_patch"},
+            "patch_id": {"type": "string", "pattern": "^patch_[a-z0-9][a-z0-9-]{2,63}$"},
+            "test_suite_id": {"type": "string", "pattern": "^suite_[a-z0-9][a-z0-9-]{2,63}$"}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["tool", "scenario_id"],
+          "properties": {
+            "tool": {"const": "reset_range"},
+            "scenario_id": {"type": "string", "pattern": "^scn_[a-z0-9][a-z0-9-]{2,63}$"}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["tool", "engagement_id"],
+          "properties": {
+            "tool": {"const": "terminate_engagement"},
+            "engagement_id": {"type": "string", "pattern": "^eng_[a-z0-9][a-z0-9-]{2,63}$"}
+          }
+        }
+      ]
+    },
+    "target_id": {
+      "type": "string",
+      "pattern": "^tgt_[a-z0-9][a-z0-9-]{2,63}$"
+    },
+    "profile_id": {
+      "type": "string",
+      "pattern": "^(?:profile|net|mdl)_[a-z0-9][a-z0-9-]{2,63}$"
+    }
+  }
+}
