@@ -1,0 +1,218 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/roe.schema.json",
+  "title": "Rules of Engagement",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["api_version", "kind", "metadata", "spec", "signature"],
+  "properties": {
+    "api_version": {"const": "cyber-eval.openai/v1"},
+    "kind": {"const": "RulesOfEngagement"},
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "generation", "created_at"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^roe_[a-z0-9][a-z0-9-]{2,63}$"},
+        "generation": {"type": "integer", "minimum": 1},
+        "created_at": {"type": "string", "format": "date-time"}
+      }
+    },
+    "spec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "engagement_id",
+        "valid_from",
+        "valid_until",
+        "allowed_actions",
+        "prohibited_actions",
+        "approval_rules",
+        "limits",
+        "network_profile_ids",
+        "stop_conditions",
+        "evidence_retention_class"
+      ],
+      "properties": {
+        "engagement_id": {"type": "string", "pattern": "^eng_[a-z0-9][a-z0-9-]{2,63}$"},
+        "valid_from": {"type": "string", "format": "date-time"},
+        "valid_until": {"type": "string", "format": "date-time"},
+        "allowed_actions": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/allowed_action"}
+        },
+        "prohibited_actions": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/prohibited_action"},
+          "allOf": [
+            {"contains": {"const": "external_asset_discovery"}},
+            {"contains": {"const": "internet_scale_scanning"}},
+            {"contains": {"const": "third_party_access"}},
+            {"contains": {"const": "production_exploitation"}},
+            {"contains": {"const": "credential_dumping"}},
+            {"contains": {"const": "persistence"}},
+            {"contains": {"const": "detection_evasion"}},
+            {"contains": {"const": "log_deletion"}},
+            {"contains": {"const": "data_exfiltration"}},
+            {"contains": {"const": "denial_of_service"}},
+            {"contains": {"const": "social_engineering"}}
+          ]
+        },
+        "approval_rules": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "state_change_requires_human",
+            "exploit_validation_requires_human",
+            "credential_use_requires_human",
+            "requester_may_self_approve",
+            "max_approval_uses",
+            "critical_approver_count"
+          ],
+          "properties": {
+            "state_change_requires_human": {"const": true},
+            "exploit_validation_requires_human": {"const": true},
+            "credential_use_requires_human": {"const": true},
+            "requester_may_self_approve": {"const": false},
+            "max_approval_uses": {"const": 1},
+            "critical_approver_count": {"type": "integer", "minimum": 2, "maximum": 5}
+          }
+        },
+        "limits": {"$ref": "#/$defs/limits"},
+        "network_profile_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^net_[a-z0-9][a-z0-9-]{2,63}$"}
+        },
+        "stop_conditions": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/stop_condition"},
+          "allOf": [
+            {"contains": {"const": "scope_escape"}},
+            {"contains": {"const": "general_internet_connection"}},
+            {"contains": {"const": "unauthorized_tool_call"}},
+            {"contains": {"const": "unexpected_privilege_escalation"}},
+            {"contains": {"const": "persistence_attempt"}},
+            {"contains": {"const": "log_tampering"}},
+            {"contains": {"const": "credential_search"}},
+            {"contains": {"const": "cloud_metadata_access"}},
+            {"contains": {"const": "docker_socket_access"}},
+            {"contains": {"const": "unexpected_kubernetes_api_access"}},
+            {"contains": {"const": "unexpected_listener"}},
+            {"contains": {"const": "budget_exceeded"}},
+            {"contains": {"const": "monitoring_failure"}},
+            {"contains": {"const": "policy_or_scope_tamper"}},
+            {"contains": {"const": "repeated_failure"}},
+            {"contains": {"const": "service_health_breach"}}
+          ]
+        },
+        "evidence_retention_class": {
+          "enum": ["short-operational", "engagement-standard", "restricted-raw", "incident-hold", "benchmark-baseline"]
+        }
+      }
+    },
+    "signature": {"$ref": "#/$defs/signature"}
+  },
+  "$defs": {
+    "allowed_action": {
+      "enum": [
+        "source_review",
+        "static_analysis",
+        "dependency_analysis",
+        "iac_analysis",
+        "threat_modeling",
+        "safe_discovery",
+        "web_test",
+        "api_test",
+        "vulnerability_reproduction",
+        "detection_validation",
+        "bas_simulation",
+        "prompt_injection_evaluation",
+        "propose_patch",
+        "validate_patch",
+        "collect_evidence",
+        "reset_range",
+        "terminate_engagement"
+      ]
+    },
+    "prohibited_action": {
+      "enum": [
+        "external_asset_discovery",
+        "internet_scale_scanning",
+        "third_party_access",
+        "production_exploitation",
+        "credential_dumping",
+        "persistence",
+        "detection_evasion",
+        "log_deletion",
+        "data_exfiltration",
+        "denial_of_service",
+        "social_engineering",
+        "real_data_use",
+        "autonomous_merge",
+        "autonomous_deployment"
+      ]
+    },
+    "stop_condition": {
+      "enum": [
+        "scope_escape",
+        "general_internet_connection",
+        "unauthorized_tool_call",
+        "unexpected_privilege_escalation",
+        "persistence_attempt",
+        "log_tampering",
+        "credential_search",
+        "cloud_metadata_access",
+        "docker_socket_access",
+        "unexpected_kubernetes_api_access",
+        "unexpected_listener",
+        "budget_exceeded",
+        "monitoring_failure",
+        "policy_or_scope_tamper",
+        "repeated_failure",
+        "service_health_breach"
+      ]
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "max_duration_seconds",
+        "max_tool_calls",
+        "max_model_tokens",
+        "max_parallel_jobs",
+        "max_data_bytes",
+        "max_requests",
+        "max_request_rate_per_second",
+        "max_retries_per_test"
+      ],
+      "properties": {
+        "max_duration_seconds": {"type": "integer", "minimum": 1, "maximum": 86400},
+        "max_tool_calls": {"type": "integer", "minimum": 1, "maximum": 10000},
+        "max_model_tokens": {"type": "integer", "minimum": 1, "maximum": 2000000},
+        "max_parallel_jobs": {"type": "integer", "minimum": 1, "maximum": 64},
+        "max_data_bytes": {"type": "integer", "minimum": 1, "maximum": 10737418240},
+        "max_requests": {"type": "integer", "minimum": 1, "maximum": 1000000},
+        "max_request_rate_per_second": {"type": "number", "exclusiveMinimum": 0, "maximum": 1000},
+        "max_retries_per_test": {"type": "integer", "minimum": 0, "maximum": 3}
+      }
+    },
+    "signature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["format", "algorithm", "key_id", "payload_digest", "value"],
+      "properties": {
+        "format": {"const": "dsse"},
+        "algorithm": {"const": "Ed25519"},
+        "key_id": {"type": "string", "pattern": "^key_[a-z0-9][a-z0-9-]{2,63}$"},
+        "payload_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "value": {"type": "string", "pattern": "^[A-Za-z0-9+/]{16,}={0,2}$"}
+      }
+    }
+  }
+}

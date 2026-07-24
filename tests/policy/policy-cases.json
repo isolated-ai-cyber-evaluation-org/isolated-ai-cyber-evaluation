@@ -1,0 +1,57 @@
+[
+  {
+    "name": "POL-001 permit authorized read-only call",
+    "overrides": {},
+    "expected": "PERMIT"
+  },
+  {
+    "name": "POL-002 deny out-of-scope target",
+    "overrides": {"target_allowed": false},
+    "expected": "DENY"
+  },
+  {
+    "name": "POL-003 require human approval for state change",
+    "overrides": {"action_class": "state_change", "approval": {"valid": false}},
+    "expected": "REQUIRE_APPROVAL"
+  },
+  {
+    "name": "POL-003 permit exact approved state change",
+    "overrides": {"action_class": "state_change"},
+    "expected": "PERMIT"
+  },
+  {
+    "name": "POL-003 reject self-approved credential use",
+    "overrides": {"action_class": "credential_use", "approval": {"self_approved": true}},
+    "expected": "REQUIRE_APPROVAL"
+  },
+  {
+    "name": "POL-004 fail closed on dependency loss",
+    "overrides": {"dependencies_healthy": false},
+    "expected": "INDETERMINATE"
+  },
+  {
+    "name": "POL-004 deny invalid manifest signature",
+    "overrides": {"signature_valid": false},
+    "expected": "DENY"
+  },
+  {
+    "name": "POL-005 deny raw destination",
+    "overrides": {"no_raw_destination": false},
+    "expected": "DENY"
+  },
+  {
+    "name": "POL-005 deny expired authorization",
+    "overrides": {"within_time": false},
+    "expected": "DENY"
+  },
+  {
+    "name": "POL-006 terminate on budget breach",
+    "overrides": {"budgets": {"exceeded": true}},
+    "expected": "TERMINATE"
+  },
+  {
+    "name": "POL-006 terminate on active stop condition",
+    "overrides": {"stop_active": true},
+    "expected": "TERMINATE"
+  }
+]

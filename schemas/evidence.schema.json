@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/evidence.schema.json",
+  "title": "Evidence metadata",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["api_version", "kind", "metadata", "spec"],
+  "properties": {
+    "api_version": {"const": "cyber-eval.openai/v1"},
+    "kind": {"const": "Evidence"},
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^ev_[a-z0-9][a-z0-9-]{2,63}$"}
+      }
+    },
+    "spec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "engagement_id",
+        "execution_id",
+        "type",
+        "classification",
+        "content_hash",
+        "size_bytes",
+        "producer_identity",
+        "collected_at",
+        "ingested_at",
+        "storage_ref",
+        "retention_class",
+        "chain_of_custody"
+      ],
+      "properties": {
+        "engagement_id": {"type": "string", "pattern": "^eng_[a-z0-9][a-z0-9-]{2,63}$"},
+        "execution_id": {"type": "string", "pattern": "^exe_[a-z0-9][a-z0-9-]{2,63}$"},
+        "target_id": {"type": "string", "pattern": "^tgt_[a-z0-9][a-z0-9-]{2,63}$"},
+        "type": {"enum": ["audit-log", "packet-capture", "process-tree", "file-diff", "metric", "trace", "tool-result", "policy-decision", "destruction-certificate", "derived-summary"]},
+        "classification": {"enum": ["synthetic", "internal", "restricted-evidence"]},
+        "content_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "size_bytes": {"type": "integer", "minimum": 0},
+        "producer_identity": {"type": "string", "pattern": "^spiffe://[a-z0-9.-]+/[A-Za-z0-9_./-]+$"},
+        "collected_at": {"type": "string", "format": "date-time"},
+        "ingested_at": {"type": "string", "format": "date-time"},
+        "storage_ref": {"type": "string", "pattern": "^evidence://ev_[a-z0-9][a-z0-9-]{2,63}$"},
+        "retention_class": {"enum": ["short-operational", "engagement-standard", "restricted-raw", "incident-hold", "benchmark-baseline"]},
+        "chain_of_custody": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["event", "actor", "at", "digest"],
+            "properties": {
+              "event": {"enum": ["collected", "ingested", "transformed", "reviewed", "exported", "held", "deleted"]},
+              "actor": {"type": "string", "minLength": 3, "maxLength": 200},
+              "at": {"type": "string", "format": "date-time"},
+              "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+            }
+          }
+        },
+        "derived_from": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^ev_[a-z0-9][a-z0-9-]{2,63}$"}
+        }
+      }
+    }
+  }
+}

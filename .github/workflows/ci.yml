@@ -1,0 +1,38 @@
+name: repository-skeleton-validation
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: skeleton-validation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validate non-executable skeleton
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout without retained credentials
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Set up pinned Node major
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "24.14.0"
+          cache: npm
+      - name: Install locked development dependencies
+        run: npm ci --ignore-scripts
+      - name: Validate schemas, types, policy, states, docs, and architecture
+        run: npm run validate
+      - name: Audit locked dependencies
+        run: npm audit --audit-level=high
+      - name: Validate CycloneDX SBOM generation
+        run: npm sbom --sbom-format=cyclonedx | node -e 'JSON.parse(require("fs").readFileSync(0, "utf8"))'

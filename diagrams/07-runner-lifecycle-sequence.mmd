@@ -1,0 +1,20 @@
+sequenceDiagram
+  participant Scheduler
+  participant Lifecycle
+  participant Attestor
+  participant Network
+  participant Runner
+  participant Observability
+  Scheduler->>Lifecycle: signed job intent
+  Lifecycle->>Lifecycle: allocate encrypted microVM
+  Lifecycle->>Attestor: verify image/host/config
+  Attestor-->>Lifecycle: measurements
+  Lifecycle->>Network: short target firewall lease
+  Lifecycle->>Runner: assign one job
+  Runner->>Observability: telemetry and artifacts
+  Runner-->>Lifecycle: complete or stop
+  Lifecycle->>Network: revoke all leases
+  Lifecycle->>Observability: final ledger
+  Observability-->>Lifecycle: evidence seal/timeout
+  Lifecycle->>Lifecycle: destroy VM, volume and key
+  Lifecycle->>Observability: residual result

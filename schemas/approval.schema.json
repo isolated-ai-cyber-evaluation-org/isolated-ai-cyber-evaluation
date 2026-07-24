@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/approval.schema.json",
+  "title": "Content-bound human approval",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["api_version", "kind", "metadata", "spec", "signature"],
+  "properties": {
+    "api_version": {"const": "cyber-eval.openai/v1"},
+    "kind": {"const": "Approval"},
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "created_at", "expires_at"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^apr_[a-z0-9][a-z0-9-]{2,63}$"},
+        "created_at": {"type": "string", "format": "date-time"},
+        "expires_at": {"type": "string", "format": "date-time"}
+      }
+    },
+    "spec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "engagement_id",
+        "scope_generation",
+        "policy_digest",
+        "requester_id",
+        "action",
+        "target_id",
+        "tool_id",
+        "test_case_id",
+        "parameter_digest",
+        "risk",
+        "state",
+        "required_approvers",
+        "max_uses",
+        "decisions"
+      ],
+      "properties": {
+        "engagement_id": {"type": "string", "pattern": "^eng_[a-z0-9][a-z0-9-]{2,63}$"},
+        "scope_generation": {"type": "integer", "minimum": 1},
+        "policy_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "requester_id": {"type": "string", "pattern": "^usr_[a-z0-9][a-z0-9-]{2,63}$"},
+        "action": {"enum": ["state_change", "exploit_validation", "credential_use", "patch_apply_to_disposable_clone", "reset_range", "evidence_retention_change"]},
+        "target_id": {"type": "string", "pattern": "^tgt_[a-z0-9][a-z0-9-]{2,63}$"},
+        "tool_id": {"type": "string", "pattern": "^tool_[a-z0-9][a-z0-9-]{2,63}$"},
+        "test_case_id": {"type": "string", "pattern": "^tc_[a-z0-9][a-z0-9-]{2,63}$"},
+        "parameter_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "credential_profile_id": {"type": "string", "pattern": "^cred_[a-z0-9][a-z0-9-]{2,63}$"},
+        "risk": {"enum": ["medium", "high", "critical"]},
+        "state": {"enum": ["requested", "under-review", "approved", "rejected", "consumed", "revoked", "expired"]},
+        "required_approvers": {"type": "integer", "minimum": 1, "maximum": 5},
+        "max_uses": {"const": 1},
+        "decisions": {
+          "type": "array",
+          "maxItems": 5,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["approver_id", "decision", "decided_at"],
+            "properties": {
+              "approver_id": {"type": "string", "pattern": "^usr_[a-z0-9][a-z0-9-]{2,63}$"},
+              "decision": {"enum": ["approved", "rejected"]},
+              "decided_at": {"type": "string", "format": "date-time"}
+            }
+          }
+        }
+      }
+    },
+    "signature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["format", "algorithm", "key_id", "payload_digest", "value"],
+      "properties": {
+        "format": {"const": "dsse"},
+        "algorithm": {"const": "Ed25519"},
+        "key_id": {"type": "string", "pattern": "^key_[a-z0-9][a-z0-9-]{2,63}$"},
+        "payload_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "value": {"type": "string", "pattern": "^[A-Za-z0-9+/]{16,}={0,2}$"}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "spec": {
+            "type": "object",
+            "properties": {"risk": {"const": "critical"}}
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "spec": {
+            "type": "object",
+            "properties": {"required_approvers": {"type": "integer", "minimum": 2}}
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "spec": {
+            "type": "object",
+            "properties": {"state": {"enum": ["approved", "consumed"]}}
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "spec": {
+            "type": "object",
+            "properties": {
+              "decisions": {
+                "type": "array",
+                "minItems": 1,
+                "contains": {
+                  "type": "object",
+                  "properties": {"decision": {"const": "approved"}},
+                  "required": ["decision"]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

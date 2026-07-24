@@ -1,0 +1,14 @@
+stateDiagram-v2
+  [*] --> REQUESTED
+  REQUESTED --> UNDER_REVIEW: eligible approver
+  REQUESTED --> EXPIRED: timeout
+  UNDER_REVIEW --> APPROVED: digest accepted
+  UNDER_REVIEW --> REJECTED: rejected
+  UNDER_REVIEW --> EXPIRED: timeout
+  APPROVED --> CONSUMED: one exact use
+  APPROVED --> REVOKED: stop/scope change
+  APPROVED --> EXPIRED: timeout
+  CONSUMED --> [*]
+  REJECTED --> [*]
+  REVOKED --> [*]
+  EXPIRED --> [*]

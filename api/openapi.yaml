@@ -1,0 +1,134 @@
+openapi: 3.1.0
+info:
+  title: Isolated AI Cyber Evaluation Skeleton
+  version: 0.2.0
+  description: Interface-only contract. No server or execution adapter exists.
+x-phase: repository-skeleton
+x-execution-enabled: false
+security:
+  - workloadMTLS: []
+paths:
+  /v1/engagement:
+    get:
+      operationId: getEngagement
+      summary: Read the current immutable engagement summary.
+      responses:
+        "200":
+          description: Synthetic engagement summary.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EngagementSummary"
+  /v1/authorized-targets:
+    get:
+      operationId: getAuthorizedTargets
+      summary: List opaque target IDs in the signed Scope.
+      responses:
+        "200":
+          description: Authorized target IDs.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TargetId"
+  /v1/allowed-test-cases:
+    get:
+      operationId: getAllowedTestCases
+      summary: List test-case IDs allowed for an optional target ID.
+      parameters:
+        - name: target_id
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/TargetId"
+      responses:
+        "200":
+          description: Authorized test-case IDs.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  pattern: ^tc_[a-z0-9][a-z0-9-]{2,63}$
+  /v1/tool-requests:
+    post:
+      operationId: requestTool
+      summary: Submit an ID-only request to the deny-only Tool Gateway.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/tool-request.schema.json"
+      responses:
+        "200":
+          description: Denied, stopped, waiting approval, or execution disabled.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ToolResponse"
+  /v1/engagements/{engagement_id}/terminate:
+    post:
+      operationId: terminateEngagement
+      summary: Request authority-reducing emergency termination.
+      parameters:
+        - name: engagement_id
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^eng_[a-z0-9][a-z0-9-]{2,63}$
+      responses:
+        "202":
+          description: Termination intent accepted by the stub state machine.
+components:
+  securitySchemes:
+    workloadMTLS:
+      type: mutualTLS
+      description: Declarative future requirement; no credentials are handled in Phase 2.
+  schemas:
+    TargetId:
+      type: string
+      pattern: ^tgt_[a-z0-9][a-z0-9-]{2,63}$
+    EngagementSummary:
+      type: object
+      additionalProperties: false
+      required:
+        - engagement_id
+        - scope_generation
+        - data_classification
+      properties:
+        engagement_id:
+          type: string
+          pattern: ^eng_[a-z0-9][a-z0-9-]{2,63}$
+        scope_generation:
+          type: integer
+          minimum: 1
+        data_classification:
+          const: synthetic
+    ToolResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - status
+        - reason_code
+        - policy_result
+      properties:
+        status:
+          enum:
+            - denied
+            - waiting-approval
+            - stopped
+            - not-implemented
+        reason_code:
+          type: string
+          pattern: ^[A-Z][A-Z0-9_]{2,63}$
+        policy_result:
+          enum:
+            - PERMIT
+            - REQUIRE_APPROVAL
+            - DENY
+            - INDETERMINATE
+            - TERMINATE

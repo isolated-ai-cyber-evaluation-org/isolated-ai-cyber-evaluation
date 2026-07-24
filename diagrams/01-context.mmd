@@ -1,0 +1,14 @@
+flowchart TB
+  Human["Authorized operator / approver"]
+  CP["Control plane"]
+  EP["Execution plane"]
+  CR["Disposable cyber range"]
+  OP["Independent observability plane"]
+  GPT["GPT-5.6 via Model Gateway"]
+  Human -->|signed scope and approvals| CP
+  CP -->|bounded job intent| EP
+  EP -->|approved ID-based tests| CR
+  CP -->|append audit| OP
+  EP -->|append telemetry| OP
+  CR -->|sensor telemetry| OP
+  CP <-->|minimized structured exchange| GPT

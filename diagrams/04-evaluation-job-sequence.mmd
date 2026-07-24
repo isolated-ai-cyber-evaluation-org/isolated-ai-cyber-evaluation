@@ -1,0 +1,24 @@
+sequenceDiagram
+  actor Human as Requester/Approver
+  participant CP as Control plane
+  participant AI as Model Gateway
+  participant EP as Execution plane
+  participant CR as Cyber range
+  participant OP as Observability
+  Human->>CP: signed engagement and ROE
+  CP->>CP: verify schema/signature/policy
+  CP->>AI: minimized context + ID tools
+  AI-->>CP: structured proposal
+  CP->>CP: policy and approval decision
+  opt approval required
+    CP->>Human: canonical action review
+    Human-->>CP: bound approval
+  end
+  CP->>EP: signed opaque job intent
+  EP->>EP: reauthorize, create Runner and lease
+  EP->>CR: fixed approved test
+  CR-->>EP: synthetic result
+  EP->>OP: telemetry and evidence
+  EP-->>CP: redacted status and evidence IDs
+  CP->>AI: evidence derivative
+  AI-->>CP: finding or patch proposal

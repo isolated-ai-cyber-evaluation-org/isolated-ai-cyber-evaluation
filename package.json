@@ -1,0 +1,31 @@
+{
+  "name": "isolated-ai-cyber-evaluation-skeleton",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "description": "Non-executable typed skeleton for an isolated AI cyber evaluation platform and range",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "scripts": {
+    "validate": "npm run typecheck && npm test && npm run test:secrets",
+    "test": "npm run test:schemas && npm run test:policy && npm run test:unit && npm run test:api && npm run test:architecture && npm run test:traceability && npm run test:docs",
+    "test:schemas": "node tests/schemas/test-schemas.mjs",
+    "test:policy": "node tests/policy/test-policy.mjs",
+    "test:unit": "node --test tests/unit/*.test.ts",
+    "test:api": "node tests/api/test-openapi.mjs",
+    "test:architecture": "node tests/architecture/test-architecture.mjs && node tests/architecture/test-non-executable.mjs",
+    "test:traceability": "node tests/traceability/test-phase-02-traceability.mjs",
+    "test:docs": "node tests/architecture/test-docs.mjs",
+    "test:secrets": "node tests/architecture/test-secrets.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit && node -e 'console.log(\"PASS TYPE-001 strict TypeScript\")' && node --check tests/schemas/test-schemas.mjs && node --check tests/policy/test-policy.mjs && node --check tests/api/test-openapi.mjs && node --check tests/architecture/test-architecture.mjs && node --check tests/architecture/test-non-executable.mjs && node --check tests/architecture/test-docs.mjs && node --check tests/architecture/test-secrets.mjs && node --check tests/traceability/test-phase-02-traceability.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "24.13.3",
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1",
+    "typescript": "7.0.2",
+    "yaml": "2.9.0"
+  }
+}

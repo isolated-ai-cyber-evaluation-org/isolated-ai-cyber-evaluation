@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/policy-decision.schema.json",
+  "title": "Policy decision without execution authority",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "api_version",
+    "kind",
+    "decision_id",
+    "engagement_id",
+    "result",
+    "reason_code",
+    "policy_digest",
+    "execution_authorized"
+  ],
+  "properties": {
+    "api_version": {"const": "cyber-eval.openai/v1"},
+    "kind": {"const": "PolicyDecision"},
+    "decision_id": {"type": "string", "pattern": "^pdec_[a-z0-9][a-z0-9-]{2,63}$"},
+    "engagement_id": {"type": "string", "pattern": "^eng_[a-z0-9][a-z0-9-]{2,63}$"},
+    "result": {"enum": ["PERMIT", "REQUIRE_APPROVAL", "DENY", "INDETERMINATE", "TERMINATE"]},
+    "reason_code": {
+      "enum": [
+        "ALL_CONTROLS_SATISFIED",
+        "HUMAN_APPROVAL_REQUIRED",
+        "AUTHORIZATION_MISMATCH",
+        "OUT_OF_SCOPE",
+        "TOOL_NOT_ALLOWED",
+        "AUTHORIZATION_EXPIRED",
+        "INPUT_INVALID",
+        "DEPENDENCY_UNHEALTHY",
+        "POLICY_ENGINE_UNAVAILABLE",
+        "STOP_ACTIVE",
+        "BUDGET_EXCEEDED",
+        "MONITORING_UNHEALTHY"
+      ]
+    },
+    "policy_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "execution_authorized": {"const": false}
+  }
+}

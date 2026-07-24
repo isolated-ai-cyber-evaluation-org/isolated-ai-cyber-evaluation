@@ -1,0 +1,32 @@
+flowchart TB
+  subgraph CP["TB-CP Control plane"]
+    Scope["Scope / ROE"]
+    Policy["Policy + approval"]
+    Orch["Orchestrator"]
+    ModelGW["Model Gateway"]
+  end
+  subgraph EP["TB-EP Execution plane"]
+    Tool["Tool Gateway"]
+    Runner["Ephemeral Runner"]
+  end
+  subgraph CR["TB-CR Cyber range"]
+    Target["Synthetic targets"]
+    Dependency["DNS / PKI / IdP / mirror"]
+  end
+  subgraph OP["TB-OP Observability plane"]
+    Ingest["Append-only ingest"]
+    WORM["WORM evidence"]
+    Score["SIEM + scoring"]
+  end
+  Scope --> Policy
+  Policy --> Orch
+  Orch --> ModelGW
+  Orch -->|opaque intent| Tool
+  Tool --> Runner
+  Runner -->|fixed flow| Target
+  Target --> Dependency
+  Orch -->|audit| Ingest
+  Runner -->|telemetry| Ingest
+  Target -->|sensor path| Ingest
+  Ingest --> WORM
+  WORM --> Score

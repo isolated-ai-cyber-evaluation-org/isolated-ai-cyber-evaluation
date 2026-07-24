@@ -1,0 +1,23 @@
+{
+  "api_version": "cyber-eval.openai/v1",
+  "kind": "Finding",
+  "metadata": {
+    "id": "find_synthetic-001",
+    "created_at": "2026-07-23T01:00:00Z"
+  },
+  "spec": {
+    "engagement_id": "eng_synthetic-web-001",
+    "target_id": "tgt_web-app-001",
+    "execution_id": "exe_synthetic-001",
+    "test_case_id": "tc_web-safe-001",
+    "title": "Synthetic training input validation finding",
+    "category": "input-validation",
+    "severity": "medium",
+    "confidence": 0.9,
+    "status": "validated",
+    "evidence_ids": ["ev_synthetic-result-001"],
+    "description": "A harmless marker demonstrates the expected validation weakness in the disposable training target.",
+    "remediation": "Apply the bounded validation change and rerun the approved regression suite.",
+    "created_by": "model"
+  }
+}

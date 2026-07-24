@@ -1,0 +1,13 @@
+flowchart TB
+  Discover["Discover: static / bounded observation"]
+  Validate["Validate: evidence-backed approved test"]
+  Remediate["Remediate: patch proposal only"]
+  Review["Human review and disposable-clone apply"]
+  Revalidate["Revalidate: security + regression tests"]
+  Close["Close finding or record residual risk"]
+  Discover --> Validate
+  Validate --> Remediate
+  Remediate --> Review
+  Review --> Revalidate
+  Revalidate -->|effective| Close
+  Revalidate -->|insufficient| Discover
